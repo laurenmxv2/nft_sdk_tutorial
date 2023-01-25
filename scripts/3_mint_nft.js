@@ -1,13 +1,29 @@
-const existing = await sdk.loadContract({
-    template: TEMPLATES.ERC721Mintable,
-    contractAddress: "0x16847AfAb268Ac7211112C19e5C47C0E36E4aE7D",
-  });
-  console.log(`Contract address is: ${existing.contractAddress}`);
+import { config as loadEnv } from 'dotenv';
+import { SDK, Auth, TEMPLATES, Metadata } from '@infura/sdk';
 
-  const mint1 = await existing.mint({
-    publicAddress: process.env.WALLET_PUBLIC_ADDRESS,
-    tokenURI: 'https://gateway.pinata.cloud/ipfs/QmRe2d92B43ReHNEn6V89jAk1ojakW6XqLSK8mTvFxeVQZ?_gl=1*lifwy*_ga*OTcwMDU3ODM2LjE2NzQyMjAyMTM.*_ga_5RMPXG14TE*MTY3NDY0MDUxNS4zLjEuMTY3NDY0MDUxNy41OC4wLjA.',
-  }
- );
- const minted = await mint1.wait();
- console.log(`Status: ${minted.status}\n NFT minted on ${minted.blockHash} with ${minted.confirmations} confirmation!`);
+loadEnv();
+
+const auth = new Auth({
+    projectId: process.env.INFURA_API_KEY,
+    secretId: process.env.INFURA_API_KEY_SECRET,
+    privateKey: process.env.WALLET_PRIVATE_KEY,
+    chainId: 5,
+    ipfs: {
+        projectId: process.env.INFURA_IPFS_API_KEY,
+        apiKeySecret: process.env.INFURA_IPFS_API_KEY_SECRET,
+    },
+});
+
+const sdk = new SDK(auth);
+
+const tx = await ERC721UserMintable.toggleSale();
+
+const sale = await tx.wait();
+
+const txMinted = await ERC721UserMintable.mint({
+    quantity: 2,
+    cost: '0.00002',
+});
+
+const mintedNFTERC721 = await txMinted.wait();
+console.log('mintedNFT: ', mintedNFTERC721);
