@@ -47,4 +47,27 @@ Metadata.openSeaTokenLevelStandard({
 
 console.log('storeArrayMetadata: ', storeArrayMetadata);
 
-module.exports = { storeArrayMetadata, collectionMetadata };
+const newContract = await sdk.deploy({
+    template: TEMPLATES.ERC721Mintable,
+    params: {
+        name: '1507Contract',
+        symbol: 'TOC',
+        contractURI: collectionMetadata,
+        baseURI: storeArrayMetadata,
+    },
+});
+
+console.log('contract address: ', newContract.contractAddress);
+
+
+//minting
+
+const tx = await ERC721Mintable.toggleSale();
+const sale = await tx.wait();
+const txMinted = await ERC721UserMintable.mint({
+    quantity: 2,
+    cost: '0.00002',
+});
+
+const mintedNFTERC721 = await txMinted.wait();
+console.log('mintedNFT: ', mintedNFTERC721);
